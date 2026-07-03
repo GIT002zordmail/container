@@ -1,6 +1,6 @@
 /**
  * LAN Proxy Server - HTTP/HTTPS Proxy with Middleware Support
- * Supports: CommonJS, ES Modules, Dynamic Imports, SOCKS5 Tunneling
+ * Supports: ES Modules, Dynamic Imports, SOCKS5 Tunneling
  */
 
 import { createProxyMiddleware } from 'http-proxy-middleware';
@@ -26,7 +26,7 @@ const CONFIG = {
     apiKey: process.env.PROXY_API_KEY || '',
     tlsCertPath: process.env.TLS_CERT_PATH || '/app/certs/server.crt',
     tlsKeyPath: process.env.TLS_KEY_PATH || '/app/certs/server.key',
-    socksSurl: process.env.SOCKS_PROXY_URL || 'socks5://cloudflared-socks:8888',
+    socksUrl: process.env.SOCKS_PROXY_URL || 'socks5://cloudflared-socks:8888',
     flaresolverrUrl: process.env.FLARESOLVERR_URL || 'http://flaresolverr:8191',
 };
 
@@ -71,7 +71,7 @@ const createFlaresolverrProxy = () => {
  */
 const createSocksProxy = () => {
     return createProxyMiddleware({
-        target: CONFIG.socksSurl,
+        target: CONFIG.socksUrl,
         changeOrigin: true,
         pathRewrite: {
             '^/socks': '',
@@ -114,7 +114,7 @@ const statusHandler = (req, res) => {
             host: CONFIG.host,
             logLevel: CONFIG.logLevel,
             flaresolverr: CONFIG.flaresolverrUrl,
-            socks: CONFIG.socksSurl,
+            socks: CONFIG.socksUrl,
         },
         uptime: process.uptime(),
         pid: process.pid,
@@ -159,7 +159,7 @@ const requestLogger = (req, res, next) => {
 };
 
 // ════════════════════════════════════════════════════════════════
-// INITIALIZE EXPRESS-LIKE HTTP SERVER
+// INITIALIZE HTTP SERVER
 // ════════════════════════════════════════════════════════════════
 
 const createServer = () => {
@@ -267,10 +267,10 @@ const startServer = async () => {
         logger.info(`Log Level: ${CONFIG.logLevel}`);
         logger.info('');
         logger.info('Available endpoints:');
-        logger.info(`  - GET  /health       : Health check`);
-        logger.info(`  - GET  /status       : Service status`);
-        logger.info(`  - POST /flaresolverr/* : FlareSolverr proxy`);
-        logger.info(`  - POST /socks/*      : SOCKS5 tunnel proxy`);
+        logger.info(`  - GET  /health              : Health check`);
+        logger.info(`  - GET  /status              : Service status`);
+        logger.info(`  - POST /flaresolverr/*      : FlareSolverr proxy`);
+        logger.info(`  - POST /socks/*             : SOCKS5 tunnel proxy`);
         logger.info('');
     });
 
